@@ -23,14 +23,33 @@ def get_all_items():
     #print(contents)
     for content in contents:
         title = content.find('span', {'class':'w_DX'}).text.strip()
+        try:
+            price = content.find('div', {'class':'b black f5 mr1 mr2-xl lh-copy f4-l'}).text.strip()
+        except:
+            price = 'no price'
+        try:
+            classification = content.find('span', {'class':'f6 f5-l normal dark-gray mb0 mt1 lh-title'}).text.strip()
+        except:
+            classification = 'no classification'
+        try:
+            review = content.find('div', {'class': 'flex flex-wrap justify-start items-center lh-title mb2 mb1-m'}).find('span').text
+        except:
+            review = 'no review'
+
+
         data_dict = {
             'title': title,
+            'price': price,
+            'classification': classification,
+            'review': review,
+
+
         }
         pages.append(data_dict)
     print(pages)
 
-    # for i in headers_contents:
-    #     pages.append(int(i.text))
+    for i in pages:
+        print(i)
 
     # #print(headers_contents)
     # total_pages = max(pages)
