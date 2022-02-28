@@ -1,0 +1,10 @@
+209.127.191.180:9279:aumgqnti:df1erwe2bzvk
+45.95.96.187:8746:aumgqnti:df1erwe2bzvk
+45.95.96.237:8796:aumgqnti:df1erwe2bzvk
+193.8.127.189:9271:aumgqnti:df1erwe2bzvk
+45.142.28.83:8094:aumgqnti:df1erwe2bzvk
+45.136.231.43:7099:aumgqnti:df1erwe2bzvk
+45.94.47.108:8152:aumgqnti:df1erwe2bzvk
+193.8.56.119:9183:aumgqnti:df1erwe2bzvk
+45.95.99.226:7786:aumgqnti:df1erwe2bzvk
+45.95.99.20:7580:aumgqnti:df1erwe2bzvk
