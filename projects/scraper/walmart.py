@@ -8,7 +8,7 @@ from projects.config import BaseConfig
 
 
 url: str = "https://www.walmart.com/search?"
-base_url: str = "https://www.walmart.com/"
+base_url: str = "https://www.walmart.com"
 
 session = requests.session()
 
