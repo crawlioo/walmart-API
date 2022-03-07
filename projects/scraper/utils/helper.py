@@ -17,7 +17,7 @@ def rotate_user_agent():
 
 # proxy rotating
 def rotate_proxy():
-    path = "proxies.txt"
+    path =  f"{os.path.join(BaseConfig.BASE_DIR, 'scraper/utils/resources/proxies.txt')}"
     with open(path, "r") as proxy_list:
         data_list: list = []
         proxies = proxy_list.readlines()

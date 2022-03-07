@@ -1,7 +1,6 @@
 from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv(dotenv_path='./../.env')
 
 class BaseConfig:
     BASE_DIR = Path(__file__).parent
@@ -11,3 +10,4 @@ class BaseConfig:
 class DevelopmentConfig(BaseConfig):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = "sqlite://db.sqlite3"
+    SQLALCHEMY_TRACK_MODIFICATIONS = True

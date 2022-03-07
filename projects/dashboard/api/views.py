@@ -8,7 +8,7 @@ class WalmartApi(Resource):
     def get(self, keywords: str):
         results = process_scraper(keywords)
         return jsonify(
-            {'message': results}
+            {'results': results}
         )
 
 

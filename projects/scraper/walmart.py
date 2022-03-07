@@ -30,7 +30,7 @@ def get_all_item(keywords: str):
         "q": keywords.replace(' ', '+'),
     }
     
-    res = scraper.get(url, params=params, headers=headers)
+    res = scraper.get(url, params=params, headers=headers, proxies=rotate_proxy())
 
     print(f"Response Status Code: {res.status_code}")
     
@@ -65,7 +65,10 @@ def get_all_item(keywords: str):
                 price = content.find('div', attrs={'class':'b black f5 mr1 mr2-xl lh-copy f4-l', 'aria-hidden': 'true'}).text.strip()
             
             link = soup.find('a', attrs={'class': 'absolute w-100 h-100 z-1'})['href']
-            rating = soup.find('div', attrs={'class':'mt2 flex items-center'}).find('span', attrs={'class':'w_A5'}).text.strip()
+            try:
+                rating = soup.find('div', attrs={'class':'mt2 flex items-center'}).find('span', attrs={'class':'w_A5'}).text.strip()
+            except:
+                rating = soup.find('span', attrs={'class': 'w_R'}).text.strip()
 
             # sorting data
             data_dict: dict = {
@@ -82,4 +85,5 @@ def get_all_item(keywords: str):
 
 def process_scraper(keywords):
     results: list = get_all_item(keywords=keywords)
+    
     return results
