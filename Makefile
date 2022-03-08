@@ -4,4 +4,4 @@ run_dev:
 
 # run windows only
 run_dev_windows:
-	scripts/run_dev.bat
+	call "scripts/run_dev.bat"
