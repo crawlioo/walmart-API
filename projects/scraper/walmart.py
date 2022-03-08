@@ -1,57 +1,87 @@
-# Scraping disini
 import os
+import cloudscraper
 import requests
 from bs4 import BeautifulSoup
 
-url: str = 'https://www.walmart.com/search?'
+from .utils.helper import rotate_proxy, rotate_user_agent
+from projects.config import BaseConfig
 
-headers: dict = {
-    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36'}
+url: str = "https://www.walmart.com/search?"
+base_url: str = "https://www.walmart.com"
 
+session = requests.session()
 
-def get_all_items(keywords: str):
-    # is used to data scraping item like price, and item do you want to scrape
-    params: dict = {
-        'q': keywords,
+headers: dict = {"user-agent": f"{rotate_user_agent()}"}
 
+scraper = cloudscraper.create_scraper(
+    sess=session,
+    browser={
+        'browser': 'chrome',
+        'platform': 'windows',
+        'mobile': False
     }
-    r = requests.get(url, params=params, headers=headers)
-    # check status_code
+)
+
+
+# ambil itemnya dulu
+def get_all_item(keywords: str):
+    product_list: list = []
+    params: dict = {
+        "q": keywords.replace(' ', '+'),
+    }
+
+    res = scraper.get(url, params=params, headers=headers)
+
+    print(f"Response Status Code: {res.status_code}")
+
+    # Check status code
     try:
-        os.mkdir('temp')
+        os.mkdir(f'{os.path.join(BaseConfig.BASE_DIR, "temp")}')
     except FileExistsError:
         pass
-    f = open('temp/item_res.html', 'w+')
-    f.write(r.text)
+
+    f = open(f'{os.path.join(BaseConfig.BASE_DIR, "temp/res_item.html")}', "w+")
+    f.write(res.text)
     f.close()
 
-    soup = BeautifulSoup(r.text, 'html.parser')
+    # Bypass BOT
+    with open(f'{os.path.join(BaseConfig.BASE_DIR, "temp/res_item.html")}', "r") as html_file:
+        soup = BeautifulSoup(html_file, 'html.parser')
+        bot = soup.find('title')
+        while bot.text.strip() == 'Robot or human?':
+            # implement proxy
+            res = scraper.get(url, params=params, headers=headers, proxies=rotate_proxy())
+            soup = BeautifulSoup(res.text, 'html.parser')
 
-    # scraping proccess
-    pages = []
-    results = soup.find('div', {'class': 'flex flex-wrap w-100 flex-grow-0 flex-shrink-0 ph2 pr0-xl pl4-xl mt0-xl mt3'})
-    contents = results.find_all('div', {'class': 'mb1 ph1 pa0-xl bb b--near-white w-25'})
+        # scraping process
+        headers_contents = soup.find('div', attrs={
+            'class': 'flex flex-wrap w-100 flex-grow-0 flex-shrink-0 ph2 pr0-xl pl4-xl mt0-xl mt3'})
+        contents = headers_contents.find_all('div', attrs={'data-testid': "list-view"})
+        for content in contents:
+            title = content.find('span', attrs={'class': 'f6 f5-l normal dark-gray mb0 mt1 lh-title'}).text.strip()
+            try:
+                price = content.find('div', attrs={'class': 'b f5 f4-l black mr1 lh-copy'}).text.strip()
+            except:
+                price = content.find('div', attrs={'class': 'b black f5 mr1 mr2-xl lh-copy f4-l',
+                                                   'aria-hidden': 'true'}).text.strip()
 
-    # print(contents)
-    for content in contents:
-        title = content.find('span', attrs={'class': 'f6 f5-l normal dark-gray mb0 mt1 lh-title'}).text
-        price = content.find('div', attrs={'class': 'b black f5 mr1 mr2-xl lh-copy f4-l', 'aria-hidden': 'true'}).text
-        link = content.find('a', attrs={'class': 'absolute w-100 h-100 z-1'})['href']
-        review = content.find('div', {'class': 'mt2 flex items-center'}).text
-        data_dict = {
-            'title': title,
-            'price': price,
-            'product_url': link,
-            'review': review,
+            link = soup.find('a', attrs={'class': 'absolute w-100 h-100 z-1'})['href']
+            rating = soup.find('div', attrs={'class': 'mt2 flex items-center'}).find('span', attrs={
+                'class': 'w_A5'}).text.strip()
 
-        }
-        pages.append(data_dict)
-    print(pages)
+            # sorting data
+            data_dict: dict = {
+                'title': title,
+                'price': price,
+                'link': base_url + link,
+                'rating': rating,
 
-    for i in pages:
-        print(i)
+            }
+            product_list.append(data_dict)
+
+        return product_list
 
 
-if __name__ == '__main__':
-    keywords = 'computer'
-    get_all_items(keywords)
+def process_scraper(keywords):
+    results: list = get_all_item(keywords=keywords)
+    return results
