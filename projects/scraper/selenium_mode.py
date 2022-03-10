@@ -3,31 +3,50 @@ from selenium.webdriver import Keys
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
-
-driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+from bs4 import BeautifulSoup
 
 website = "https://www.walmart.com/search?q=computer"
 
-# searches
-driver.get(website)
 
-search_box =  driver.find_element(by=By.NAME, value='q')
-search_box.send_keys('Belajar automation testing' + Keys.ENTER)
+def get_all_items():
 
-items = driver.find_element(By.CLASS_NAME, 'w_R')
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+
+    # searches
+    driver.get(website)
+
+    pages_source = driver.page_source
+    soup = BeautifulSoup(pages_source, 'html.parser')
+    product_list: list = []
+    #scraping proccess
+    headers_contents = soup.find('div', attrs={'class':'flex flex-wrap w-100 flex-grow-0 flex-shrink-0 ph2 pr0-xl pl4-xl mt0-xl mt3'})
+    contents = headers_contents.find_all('div', attrs={'data-testid':'list-view'})
+    for content in contents:
+
+        title = content.find('span', attrs={'class':'f6 f5-l normal dark-gray mb0 mt1 lh-title'}).text.strip()
+        try:
+            price = content.find('div', attrs={'class': 'b f5 f4-l black mr1 lh-copy'}).text.strip()
+        except:
+            price = content.find('div', attrs={'class' :'b black f5 mr1 mr2-xl lh-copy f4-l', 'aria-hidden': 'true'}).text.strip()
+        link = soup.find('a', attrs={'class': 'absolute w-100 h-100 z-1'})['href']
+        try:
+            rating = soup.find('div', attrs={'class': 'mt2 flex items-center'}).find('span', attrs={'class': 'w_A5'}).text.strip()
+        except:
+            rating = soup.find('span', attrs={'w_R'}).text.strip()
+
+        data_dict : dict ={
+            'title' : title,
+            'price': price,
+            'link': link,
+            'rating': rating,
+
+        }
+        print(data_dict)
+
+        product_list.append(data_dict)
 
 
-    # data_dict= {
-    #     'title': title,
-    #     'price': price,
-    #     'link': base_url + link,
-    #     'rating': rating,
-    #
-    # }
 
 
-
-
-
-
-
+if __name__ == '__main__':
+    get_all_items()
