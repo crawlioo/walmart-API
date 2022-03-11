@@ -1,8 +1,7 @@
 from selenium import webdriver
-from selenium.webdriver import Keys
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
 
 website = "https://www.walmart.com/search?q=computer"
@@ -10,9 +9,14 @@ website = "https://www.walmart.com/search?q=computer"
 
 def get_all_items():
 
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+    options = Options()
+    options.add_argument("start-maximized")
 
-    # searches
+    #avoiding detection
+    options.add_argument('--disable-blink-features=AutomationControlled')
+    driver = webdriver.Chrome( options=options, service=Service (ChromeDriverManager().install()))
+
+    # get url
     driver.get(website)
 
     pages_source = driver.page_source
