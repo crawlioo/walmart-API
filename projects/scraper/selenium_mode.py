@@ -1,31 +1,40 @@
 import time
-
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.common.by import By
 from bs4 import BeautifulSoup
 
 website = "https://www.walmart.com/search?q=computer"
 
-def get_total_pages(keywords):
+def get_total_pages():
     # used to search total pages
 
+    options = Options()
+    options.headless = False
+
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
-    actions = ActionChains(driver)
-    next_page_btn = driver.find_element(By.XPATH, ('//li[@aria-label="false"]//a'))
-    actions.move_to_element(next_page_btn).perform()
-    time.sleep(0.5)
-    next_page_btn.click()
+
     # get url
     driver.get(website)
+    #maximize_windows
+    driver.maximize_window()
 
+    #pagination
     pages_source = driver.page_source
+    f = open("selenium_mode.html", "w+" )
+    f.write(pages_source)
+    f.close()
     soup = BeautifulSoup(pages_source, 'html.parser')
+    pages = []
+    headers_contents = soup.find('ul', attrs={'class':'list flex items-center justify-center pa0'} ).find_all('li')
+    for i in headers_contents:
+        pages.append(i.text)
 
-    pages =[]
+    # handle pagination
+
+
+
 
 def get_all_items():
 
@@ -73,5 +82,6 @@ def get_all_items():
 
 
 if __name__ == '__main__':
-    get_total_pages()
-    get_all_items()
+    data = ['', '1', '2', '3', '4', '...', '25', '']
+
+
