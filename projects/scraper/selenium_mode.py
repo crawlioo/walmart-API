@@ -22,18 +22,27 @@ def get_total_pages():
 
     #pagination
     pages_source = driver.page_source
+
+    # temporary file
     f = open("selenium_mode.html", "w+" )
     f.write(pages_source)
     f.close()
+
+    # scraping process
     soup = BeautifulSoup(pages_source, 'html.parser')
     pages = []
-    headers_contents = soup.find('ul', attrs={'class':'list flex items-center justify-center pa0'} ).find_all('li')
-    for i in headers_contents:
-        pages.append(i.text)
-
+    data = []
     # handle pagination
+    headers_contents = soup.find('ul', attrs={'class': 'list flex items-center justify-center pa0'}).find_all('li')
+    for i in headers_contents:
+        data.append(i.text)
 
-
+    for i in data:
+        if i.isnumeric():
+            pages.append(int(i))
+    total_pages = max(pages)
+    print('Total pages yang didapatkan:', total_pages)
+    return total_pages
 
 
 def get_all_items():
@@ -79,9 +88,14 @@ def get_all_items():
         product_list.append(data_dict)
 
 
-
-
 if __name__ == '__main__':
-    data = ['', '1', '2', '3', '4', '...', '25', '']
+    # pages = []
+    # data = ['', '1', '2', '3', '4', '...', '25', '']
+    get_total_pages()
 
+
+    # get_pagination = []
+    # for page in data:
+    #     get_pagination.append(page[24])
+    # print(get_pagination)
 
