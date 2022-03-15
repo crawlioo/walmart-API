@@ -5,11 +5,13 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
 
-website = "https://www.walmart.com/search?q=computer"
 
-def get_total_pages():
+
+
+def get_total_pages(keypass):
     # used to search total pages
 
+    website = f'https://www.walmart.com/search?q={keypass}'
     options = Options()
     options.headless = False
 
@@ -45,8 +47,15 @@ def get_total_pages():
     return total_pages
 
 
-def get_all_items():
+def get_all_items(keypass):
+    pages = BeautifulSoup.find('')
+    # pages = BeautifulSoup(, 'html.parser')
+    # while pages.text.strip() == 'Robot or human?':
+    #     # implement proxy
+    #     keypass =
+    #     soup = BeautifulSoup(res.text, 'html.parser')
 
+    website = f'https://www.walmart.com/search?q={keypass}'
     options = Options()
     options.add_argument("start-maximized")
 
@@ -83,9 +92,9 @@ def get_all_items():
             'rating': rating,
 
         }
-        print(data_dict)
-
         product_list.append(data_dict)
+    return product_list
+
 
 
 if __name__ == '__main__':
