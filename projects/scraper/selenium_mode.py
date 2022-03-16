@@ -75,7 +75,7 @@ def get_all_items(keypass, pages):
 
         contents = headers_contents.find_all('div', attrs={'data-testid': 'list-view'})
     except:
-       contents = headers_contents.find_all('div', attrs={'h2 relative mb2'})
+        contents = headers_contents.find_all('div', attrs={'h2 relative mb2'})
     for content in contents:
 
         title = content.find('span', attrs={'class': 'f6 f5-l normal dark-gray mb0 mt1 lh-title'}).text.strip()
@@ -109,6 +109,30 @@ def get_all_items(keypass, pages):
     return product_list
 
 
+def get_detail_pages():
+    website = f'https://www.walmart.com/ip/HP-22-AIO-Celeron-Blue-4GB-256GB-Desktop-All-In-One/242555856'
+    options = Options
+
+
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+
+    driver.get(website)
+
+    page_source = driver.page_source
+    soup = BeautifulSoup(page_source, 'html.parser')
+    produc_detail: list = []
+    # scraping proccess
+    headers_contents = soup.find('div', attrs={'class': 'ph4'})
+    try:
+        contents = headers_contents.find_all('div', attrs={'class': 'w_Bq w_Br flex-row-reverse'})
+    except:
+        contents = headers_contents.find_all('div', attrs={'class': 'w_Bs w_Cr w_B0'})
+
+    for content in contents:
+        title = content.find('section', attrs={'class':'ma3 ma0-m mt3-m flex flex-column'}).text.strip()
+        produc_detail.append(title)
+    print(produc_detail)
+
 def main(keypass):
     final_result = []
 
@@ -126,11 +150,5 @@ def main(keypass):
 
 if __name__ == '__main__':
     keypass = 'computer'  # <bisa diganti input
-    main(keypass)
-    # pages = []
-    # data = ['', '1', '2', '3', '4', '...', '25', '']
+    get_detail_pages()
 
-    # get_pagination = []
-    # for page in data:
-    #     get_pagination.append(page[24])
-    # print(get_pagination)
