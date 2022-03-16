@@ -46,12 +46,6 @@ def get_total_pages(keypass):
 
 
 def get_all_items(keypass, pages):
-    # pages = BeautifulSoup(, 'html.parser')
-    # while pages.text.strip() == 'Robot or human?':
-    #     # implement proxy
-    #     keypass =
-    #     soup = BeautifulSoup(res.text, 'html.parser')
-
     website = f'https://www.walmart.com/search?q={keypass}&page={pages}&affinityOverride=default'
     options = Options()
     options.add_argument("start-maximized")
@@ -111,25 +105,34 @@ def get_all_items(keypass, pages):
 
 def get_detail_pages():
     website = f'https://www.walmart.com/ip/HP-22-AIO-Celeron-Blue-4GB-256GB-Desktop-All-In-One/242555856'
-    options = Options
+    options = Options()
 
 
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+    driver = webdriver.Chrome(options=options, service=Service(ChromeDriverManager().install()))
 
     driver.get(website)
 
     page_source = driver.page_source
     soup = BeautifulSoup(page_source, 'html.parser')
+    # temporary file
+    f = open("detail_page.html", "w+")
+    f.write(page_source)
+    f.close()
+
     produc_detail: list = []
     # scraping proccess
     headers_contents = soup.find('div', attrs={'class': 'ph4'})
-    try:
-        contents = headers_contents.find_all('div', attrs={'class': 'w_Bq w_Br flex-row-reverse'})
-    except:
-        contents = headers_contents.find_all('div', attrs={'class': 'w_Bs w_Cr w_B0'})
+    contents = headers_contents.find_all('div', attrs={'class': 'w_Bq w_Br flex-row-reverse'})
+
 
     for content in contents:
-        title = content.find('section', attrs={'class':'ma3 ma0-m mt3-m flex flex-column'}).text.strip()
+        try:
+            title = content.find('section', attrs={'class':'ma3 ma0-m mt3-m flex flex-column'}).text.strip()
+            print(title)
+        except:
+            title = content.find('h1', attrs={'class':'f3 b lh-copy dark-gray mt1 mb2'}).text.strip()
+            print(title)
+
         produc_detail.append(title)
     print(produc_detail)
 
