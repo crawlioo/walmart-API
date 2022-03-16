@@ -11,7 +11,7 @@ def get_total_pages(keypass):
 
     website = f'https://www.walmart.com/search?q={keypass}'
     options = Options()
-    options.headless = True
+    # options.headless = True
 
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
 
@@ -58,7 +58,7 @@ def get_all_items(keypass, pages):
 
     # avoiding detection
     options.add_argument('--disable-blink-features=AutomationControlled')
-    options.headless = True
+    # options.headless = True
 
     driver = webdriver.Chrome(options=options, service=Service(ChromeDriverManager().install()))
 
@@ -71,7 +71,11 @@ def get_all_items(keypass, pages):
     # scraping proccess
     headers_contents = soup.find('div', attrs={
         'class': 'flex flex-wrap w-100 flex-grow-0 flex-shrink-0 ph2 pr0-xl pl4-xl mt0-xl mt3'})
-    contents = headers_contents.find_all('div', attrs={'data-testid': 'list-view'})
+    try:
+
+        contents = headers_contents.find_all('div', attrs={'data-testid': 'list-view'})
+    except:
+       contents = headers_contents.find_all('div', attrs={'h2 relative mb2'})
     for content in contents:
 
         title = content.find('span', attrs={'class': 'f6 f5-l normal dark-gray mb0 mt1 lh-title'}).text.strip()
