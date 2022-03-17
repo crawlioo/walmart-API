@@ -5,6 +5,8 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
 
+base_url: str = "https://www.walmart.com"
+
 
 def get_total_pages(keypass):
     # used to search total pages
@@ -93,7 +95,7 @@ def get_all_items(keypass, pages):
         data_dict: dict = {
             'title': title,
             'price': price,
-            'link': link,
+            'link': base_url +link,
             'rating': rating,
 
         }
@@ -103,14 +105,12 @@ def get_all_items(keypass, pages):
     return product_list
 
 
-def get_detail_pages():
-    website = f'https://www.walmart.com/ip/HP-22-AIO-Celeron-Blue-4GB-256GB-Desktop-All-In-One/242555856'
+def get_detail_pages(url):
     options = Options()
-
 
     driver = webdriver.Chrome(options=options, service=Service(ChromeDriverManager().install()))
 
-    driver.get(website)
+    driver.get(url)
 
     page_source = driver.page_source
     soup = BeautifulSoup(page_source, 'html.parser')
@@ -121,20 +121,20 @@ def get_detail_pages():
 
     produc_detail: list = []
     # scraping proccess
-    headers_contents = soup.find('div', attrs={'class': 'ph4'})
-    contents = headers_contents.find_all('div', attrs={'class': 'w_Bq w_Br flex-row-reverse'})
 
+    title = soup.find('h1', attrs={'class': 'f3 b lh-copy dark-gray mt1 mb2'}).text.strip()
+    price = soup.find('span', attrs={'class': 'b lh-copy dark-gray mr2 f1'}).text.strip()
+    rating = soup.find('div', attrs={'class': 'flex flex-row items-center justify-end h2'}).find('span', attrs={
+        'class': 'w_R'}).text.strip()
 
-    for content in contents:
-        try:
-            title = content.find('section', attrs={'class':'ma3 ma0-m mt3-m flex flex-column'}).text.strip()
-            print(title)
-        except:
-            title = content.find('h1', attrs={'class':'f3 b lh-copy dark-gray mt1 mb2'}).text.strip()
-            print(title)
+    detail_pages = {
+        'title': title,
+        'price': price,
+        'rating': rating,
+    }
+    print(detail_pages)
+    return produc_detail
 
-        produc_detail.append(title)
-    print(produc_detail)
 
 def main(keypass):
     final_result = []
@@ -149,9 +149,10 @@ def main(keypass):
     total_data = len(final_result)
 
     print('Ini adalah total halaman yang sudah di scrape '.format(total_data))
+    for result in final_result:
+        get_detail_pages(result['link'])
 
 
 if __name__ == '__main__':
     keypass = 'computer'  # <bisa diganti input
-    get_detail_pages()
-
+    main(keypass)
